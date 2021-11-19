@@ -82,6 +82,9 @@ def main():
 
     # define inner helper function to process commands either from input file or user
     def proc_cmd(cmd):
+        # ensure we have handles on global references to these variables
+        global rdata_count
+        global sdata_count
         if cmd == "PASSIVE":
             try:
                 fsm.PASSIVE()
@@ -115,7 +118,6 @@ def main():
         elif cmd == "RDATA":
             try:
                 fsm.RDATA()
-                global rdata_count
                 rdata_count += 1
                 print("DATA received {}".format(rdata_count))
             except MachineError as e:
@@ -123,7 +125,6 @@ def main():
         elif cmd == "SDATA":
             try:
                 fsm.SDATA()
-                global sdata_count
                 sdata_count += 1
                 print("DATA sent {}".format(sdata_count))
             except MachineError as e:
@@ -137,7 +138,9 @@ def main():
         elif cmd == "CLOSE":
             try:
                 fsm.CLOSE()
-                # should we be resetting SDATA / RDATA counters here ?
+                # reset data counters on simulated connection close
+                rdata_count = 0
+                sdata_count = 0
                 print("Event {} received, current State is {}".format(cmd, fsm.state))
             except MachineError as e:
                 print(e)
